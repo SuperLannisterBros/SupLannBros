@@ -1,12 +1,45 @@
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
+int ground = 150;
+class PLAYER {
+public:
+float dx,dy;
+FloatRect rect;
+bool onGround;
+Sprite sprite;
+float currentFrame;
+
+	PLAYER(Texture &image)
+	{
+		sprite.setTexture(image);
+		rect = FloatRect(0,0,40,50);
+		dx=dy=0;
+		currentFrame = 0;
+	}
+	void update(float time)
+{
+	rect.left+=dx*time;
+	if (!onGround) dy=dy+0.00005*time;
+	rect.top +=dy*time;
+	onGround=false;
+	if (rect.top > ground) { rect.top = ground; dy=0; onGround = true;}
+	currentFrame +=0.005*time;
+	if (currentFrame > 6) currentFrame -=6;
+	if (dx>0) sprite.setTextureRect(IntRect(40*int(currentFrame),244,40,50));
+	if (dx<0) sprite.setTextureRect(IntRect(40*int(currentFrame)+40,244,-40,50));
+	sprite.setPosition(rect.left, rect.top);
+	dx=0;
+}
+};
+
+
 
 int main()
 
 {
 
-RenderWindow window( VideoMode(200, 200), "Test!");
+RenderWindow window( VideoMode(1000, 1000), "Test!");
 
 CircleShape MyCircle(100.f);
 MyCircle.setFillColor(Color::Green);
@@ -16,10 +49,7 @@ t.loadFromFile("fang.png");
 
 float currentFrame=0;
 
-Sprite s;
-s.setTexture(t);
-s.setTextureRect( IntRect(0,244,40,50));
-s.setPosition(50,100);
+PLAYER p(t);
 
 Clock clock;
 
@@ -27,6 +57,7 @@ while (window.isOpen())
 {
 	float time = clock.getElapsedTime().asMicroseconds();
 	clock.restart();
+	time = time/300;
 	Event event;
 	while (window.pollEvent(event))
 	{
@@ -36,28 +67,20 @@ while (window.isOpen())
 
 	if (Keyboard::isKeyPressed(Keyboard::Left))
 	{
-		s.move(-0.1*time/350,0);
-
-		currentFrame +=0.005*time/350;
-		if (currentFrame > 6) currentFrame -=6;
-		s.setTextureRect(IntRect(40*int(currentFrame)+40,244,-40,50));
+		p.dx=-0.1;
 	}
 	if (Keyboard::isKeyPressed(Keyboard::Right))
 	{
-		s.move(0.1*time/350,0);
-
-		currentFrame +=0.005*time/350;
-		if (currentFrame > 6) currentFrame -=6;
-		s.setTextureRect(IntRect(40*int(currentFrame),244,40,50));
+		p.dx=0.1;
 	}
 	if (Keyboard::isKeyPressed(Keyboard::Up))
 	{
-		s.move(0,0.1);
+		if (p.onGround) {p.dy=-0.4; p.onGround=false;}
 	}
 
-
+	p.update(time);
 	window.clear();
-	window.draw(s);
+	window.draw(p.sprite);
 	window.display();
 
 

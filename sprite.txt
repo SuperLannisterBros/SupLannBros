@@ -6,7 +6,7 @@ int main()
 
 {
 
-RenderWindow window( VideoMode(800, 600), "Test!");
+RenderWindow window( VideoMode(200, 200), "Test!");
 
 CircleShape MyCircle(100.f);
 MyCircle.setFillColor(Color::Green);
@@ -21,8 +21,12 @@ s.setTexture(t);
 s.setTextureRect( IntRect(0,244,40,50));
 s.setPosition(50,100);
 
+Clock clock;
+
 while (window.isOpen())
 {
+	float time = clock.getElapsedTime().asMicroseconds();
+	clock.restart();
 	Event event;
 	while (window.pollEvent(event))
 	{
@@ -32,17 +36,17 @@ while (window.isOpen())
 
 	if (Keyboard::isKeyPressed(Keyboard::Left))
 	{
-		s.move(-0.1,0);
+		s.move(-0.1*time/350,0);
 
-		currentFrame +=0.005;
+		currentFrame +=0.005*time/350;
 		if (currentFrame > 6) currentFrame -=6;
 		s.setTextureRect(IntRect(40*int(currentFrame)+40,244,-40,50));
 	}
 	if (Keyboard::isKeyPressed(Keyboard::Right))
 	{
-		s.move(0.1,0);
+		s.move(0.1*time/350,0);
 
-		currentFrame +=0.005;
+		currentFrame +=0.005*time/350;
 		if (currentFrame > 6) currentFrame -=6;
 		s.setTextureRect(IntRect(40*int(currentFrame),244,40,50));
 	}

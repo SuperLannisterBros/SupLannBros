@@ -1,36 +1,38 @@
+#include "stdafx.h"
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
-int ground = 150;
+
+int ground = 350;
 class PLAYER {
 public:
-float dx,dy;
-FloatRect rect;
-bool onGround;
-Sprite sprite;
-float currentFrame;
+	float dx, dy;
+	FloatRect rect;
+	bool onGround;
+	Sprite sprite;
+	float currentFrame;
 
 	PLAYER(Texture &image)
 	{
 		sprite.setTexture(image);
-		rect = FloatRect(0,0,40,50);
-		dx=dy=0;
+		rect = FloatRect(0, 0, 40, 50);
+		dx = dy = 0;
 		currentFrame = 0;
 	}
 	void update(float time)
-{
-	rect.left+=dx*time;
-	if (!onGround) dy=dy+0.00005*time*10;
-	rect.top +=dy*time;
-	onGround=false;
-	if (rect.top > ground) { rect.top = ground; dy=0; onGround = true;}
-	currentFrame +=0.005*time;
-	if (currentFrame > 6) currentFrame -=6;
-	if (dx>0) sprite.setTextureRect(IntRect(40*int(currentFrame),244,40,50));
-	if (dx<0) sprite.setTextureRect(IntRect(40*int(currentFrame)+40,244,-40,50));
-	sprite.setPosition(rect.left, rect.top);
-	dx=0;
-}
+	{
+		rect.left += dx*time;
+		if (!onGround) dy = dy + 0.00005*time * 10;
+		rect.top += dy*time;
+		onGround = false;
+		if (rect.top > ground) { rect.top = ground; dy = 0; onGround = true; }
+		currentFrame += 0.005*time;
+		if (currentFrame > 6) currentFrame -= 6;
+		if (dx>0) sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
+		if (dx<0) sprite.setTextureRect(IntRect(40 * int(currentFrame) + 40, 244, -40, 50));
+		sprite.setPosition(rect.left, rect.top);
+		dx = 0;
+	}
 };
 
 
@@ -39,51 +41,51 @@ int main()
 
 {
 
-RenderWindow window( VideoMode(1000, 1000), "Test!");
+	RenderWindow window(VideoMode(600, 400), "Test!");
 
-Texture t;
-t.loadFromFile("fang.png");
+	Texture t;
+	t.loadFromFile("fang.png");
 
-float currentFrame=0;
+	float currentFrame = 0;
 
-PLAYER p(t);
+	PLAYER p(t);
 
-Clock clock;
+	Clock clock;
 
-while (window.isOpen())
-{
-	float time = clock.getElapsedTime().asMicroseconds();
-	clock.restart();
-	time = time/300;
-	Event event;
-	while (window.pollEvent(event))
+	while (window.isOpen())
 	{
-		if (event.type == Event::Closed)
-			window.close();
+		float time = clock.getElapsedTime().asMicroseconds();
+		clock.restart();
+		time = time / 300;
+		Event event;
+		p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed)
+				window.close();
+		}
+
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+		{
+			p.dx = -0.1;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Right))
+		{
+			p.dx = 0.1;
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Up))
+		{
+			if (p.onGround) { p.dy = -0.4; p.onGround = false; }
+		}
+
+		p.update(time);
+		window.clear();
+		window.draw(p.sprite);
+		window.display();
+
+
 	}
 
-	if (Keyboard::isKeyPressed(Keyboard::Left))
-	{
-		p.dx=-0.1;
-	}
-	if (Keyboard::isKeyPressed(Keyboard::Right))
-	{
-		p.dx=0.1;
-	}
-	if (Keyboard::isKeyPressed(Keyboard::Up))
-	{
-		if (p.onGround) {p.dy=-0.4; p.onGround=false;}
-	}
-
-	p.update(time);
-	window.clear();
-	window.draw(p.sprite);
-	window.display();
-
-
-}
-
-
-return 0;
+	return 0;
 
 }

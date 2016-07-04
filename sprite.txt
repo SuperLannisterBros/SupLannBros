@@ -20,7 +20,7 @@ float currentFrame;
 	void update(float time)
 {
 	rect.left+=dx*time;
-	if (!onGround) dy=dy+0.00005*time;
+	if (!onGround) dy=dy+0.00005*time*10;
 	rect.top +=dy*time;
 	onGround=false;
 	if (rect.top > ground) { rect.top = ground; dy=0; onGround = true;}
@@ -40,9 +40,6 @@ int main()
 {
 
 RenderWindow window( VideoMode(1000, 1000), "Test!");
-
-CircleShape MyCircle(100.f);
-MyCircle.setFillColor(Color::Green);
 
 Texture t;
 t.loadFromFile("fang.png");

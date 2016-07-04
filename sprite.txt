@@ -3,7 +3,7 @@
 
 using namespace sf;
 
-const int H = 15;
+const int H = 12;
 const int W = 40;
 
 String TileMap[H] = {
@@ -16,19 +16,16 @@ String TileMap[H] = {
 	"B         BBBB                BBBB     B",
 	"B                                B     B",
 	"BBB                              B     B",
-	"B                                BB    B",
-	"B                     B                B",
+	"B              BB                BB    B",
+	"B              BB                      B",
 	"B    B         BB         BB           B",
-	"B             B                        B",
-	"B          B                           B",
-	"B        B                             B",
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 
 };
 
 
 
-int ground = 398;
+int ground = 350;
 class PLAYER {
 public:
 	float dx, dy;
@@ -40,7 +37,7 @@ public:
 	PLAYER(Texture &image)
 	{
 		sprite.setTexture(image);
-		rect = FloatRect(32, 0, 40, 50);
+		rect = FloatRect(0, 0, 40, 50);
 		dx = dy = 0;
 		currentFrame = 0;
 	}
@@ -66,7 +63,7 @@ int main()
 
 {
 
-	RenderWindow window(VideoMode(640, 480), "Game");
+	RenderWindow window(VideoMode(600, 400), "Game");
 
 	Texture t;
 	t.loadFromFile("fang.png");

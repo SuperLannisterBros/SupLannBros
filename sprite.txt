@@ -3,6 +3,8 @@
 
 using namespace sf;
 
+float offsetX = 0, offsetY = 0;
+
 const int H = 15;
 const int W = 40;
 
@@ -55,7 +57,8 @@ public:
 		if (currentFrame > 6) currentFrame -= 6;
 		if (dx>0) sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
 		if (dx<0) sprite.setTextureRect(IntRect(40 * int(currentFrame) + 40, 244, -40, 50));
-		sprite.setPosition(rect.left, rect.top);
+
+		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
 	}
 };
@@ -105,6 +108,10 @@ int main()
 		}
 
 		p.update(time);
+
+		offsetX = p.rect.left - 640/2;
+		offsetY = p.rect.top - 480/2;
+
 		window.clear();
 
 		for (int i = 0; i<H; i++)
@@ -114,7 +121,7 @@ int main()
 
 				if (TileMap[i][j] == ' ') continue;
 
-				rectangle.setPosition(j * 32, i * 32);
+				rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 				window.draw(rectangle);
 			}
 

@@ -109,8 +109,8 @@ int main()
 
 		p.update(time);
 
-		offsetX = p.rect.left - 640/2;
-		offsetY = p.rect.top - 480/2;
+		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
+		if (p.rect.top<480 / 2) offsetY = p.rect.top - 480 / 2;
 
 		window.clear();
 

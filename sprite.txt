@@ -3,7 +3,7 @@
 
 using namespace sf;
 
-const int H = 12;
+const int H = 15;
 const int W = 40;
 
 String TileMap[H] = {
@@ -16,16 +16,19 @@ String TileMap[H] = {
 	"B         BBBB                BBBB     B",
 	"B                                B     B",
 	"BBB                              B     B",
-	"B              BB                BB    B",
-	"B              BB                      B",
+	"B                                BB    B",
+	"B                     B                B",
 	"B    B         BB         BB           B",
+	"B             B                        B",
+	"B          B                           B",
+	"B        B                             B",
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 
 };
 
 
 
-int ground = 350;
+int ground = 398;
 class PLAYER {
 public:
 	float dx, dy;
@@ -37,7 +40,7 @@ public:
 	PLAYER(Texture &image)
 	{
 		sprite.setTexture(image);
-		rect = FloatRect(0, 0, 40, 50);
+		rect = FloatRect(32, 0, 40, 50);
 		dx = dy = 0;
 		currentFrame = 0;
 	}
@@ -63,7 +66,7 @@ int main()
 
 {
 
-	RenderWindow window(VideoMode(600, 400), "Game");
+	RenderWindow window(VideoMode(640, 480), "Game");
 
 	Texture t;
 	t.loadFromFile("fang.png");
@@ -75,14 +78,13 @@ int main()
 	Clock clock;
 
 	RectangleShape rectangle(Vector2f(32, 32));
-
+	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
 	while (window.isOpen())
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
 		time = time / 300;
 		Event event;
-		p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
 		while (window.pollEvent(event))
 		{
 			if (event.type == Event::Closed)

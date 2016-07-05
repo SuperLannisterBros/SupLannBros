@@ -11,14 +11,14 @@ const int W = 40;
 String TileMap[H] = {
 
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"B                                B     B",
-	"B                                B     B",
-	"B                   BB           B     B",
-	"B                                B     B",
-	"B         BBBB                BBBB     B",
-	"B                                B     B",
-	"BBB                              B     B",
-	"B                                BB    B",
+	"B                          BB BB       B",
+	"B                         B  B  B      B",
+	"B                   BB    B     B      B",
+	"B                          B   B       B",
+	"B         BBBB              B B        B",
+	"B                            B         B",
+	"BBB                                    B",
+	"B                                      B",
 	"B                     B                B",
 	"B    B         BB         BB           B",
 	"B             B                        B",
@@ -49,6 +49,7 @@ public:
 	void update(float time)
 	{
 		rect.left += dx*time;
+		CollisionX();
 		if (!onGround) dy = dy + 0.00005*time * 10;
 		rect.top += dy*time;
 		onGround = false;
@@ -61,6 +62,24 @@ public:
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
 	}
+
+	void CollisionX()
+	{
+		for (int i = rect.top / 32; i < (rect.top + rect.height) / 32; i++)
+			for (int j = rect.left / 32; j < (rect.left + rect.width) / 32; j++)
+			{
+				if (TileMap[i][j] == 'B')
+				{
+					if (dx > 0) rect.left = j * 32 - rect.width;
+					if (dx < 0) rect.left = j * 32 + 32;
+				}
+			}
+	}
+
+
+
+
+
 };
 
 

@@ -1,5 +1,3 @@
-#include "stdafx.h"
-#include <string.h>
 #include <SFML/Graphics.hpp>
 
 using namespace sf;
@@ -23,8 +21,8 @@ String TileMap[H] = {
 	"B                     B                B",
 	"B    B         BB         BB           B",
 	"B             B                        B",
-	"B          B                           B",
-	"B        B                             B",
+	"BBBBBB  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBB  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 
 };
@@ -107,7 +105,7 @@ int main()
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
-		time = time / 300;
+		time = time / 400;
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -131,7 +129,7 @@ int main()
 		p.update(time);
 
 		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
-		
+
 
 		window.clear();
 

@@ -52,6 +52,7 @@ public:
 		CollisionX();
 		if (!onGround) dy = dy + 0.00005*time * 10;
 		rect.top += dy*time;
+		CollisionY();
 		onGround = false;
 		if (rect.top > ground) { rect.top = ground; dy = 0; onGround = true; }
 		currentFrame += 0.005*time;
@@ -76,7 +77,18 @@ public:
 			}
 	}
 
-
+	void CollisionY()
+	{
+		for (int i = rect.top / 32; i < (rect.top + rect.height) / 32; i++)
+			for (int j = rect.left / 32; j < (rect.left + rect.width) / 32; j++)
+			{
+				if (TileMap[i][j] == 'B')
+				{
+					if (dy>0)  { rect.top = i * 32 - rect.height;  dy = 0;   onGround = true; }
+					if (dy<0)  { rect.top = i * 32 + 32;   dy = 0; }
+				}
+			}
+	}
 
 
 
@@ -151,6 +163,4 @@ int main()
 
 	}
 
-	return 0;
-
-}
+	

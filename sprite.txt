@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <string.h>
 #include <SFML/Graphics.hpp>
 
@@ -17,7 +18,7 @@ String TileMap[H] = {
 	"B                          B   B       B",
 	"B         BBBB              B B        B",
 	"B                            B         B",
-	"BBB                                    B",
+	"BBB               B                    B",
 	"B                                      B",
 	"B                     B                B",
 	"B    B         BB         BB           B",
@@ -130,7 +131,7 @@ int main()
 		p.update(time);
 
 		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
-		if (p.rect.top<480 / 2) offsetY = p.rect.top - 480 / 2;
+		
 
 		window.clear();
 

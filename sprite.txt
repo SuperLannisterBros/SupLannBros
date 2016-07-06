@@ -10,20 +10,20 @@ const int W = 40;
 String TileMap[H] = {
 
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"B                          BB BB       B",
-	"B                         B  B  B      B",
-	"B                   BB    B     B      B",
-	"B                          B   B       B",
-	"B         BBBB              B B        B",
-	"B                            B         B",
-	"BBB               B                    B",
 	"B                                      B",
-	"B                     B                B",
-	"B    B         BB         BB           B",
-	"B             B                        B",
-	"BBBBBB  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"BBBBBB  BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"B                    GG                B",
+	"B                G   BB                B",
+	"B            G              B   B      B",
+	"B         BBBB                         B",
+	"B                                      B",
+	"BBB               B                    B",
+	"B          GG                          B",
+	"B                     B    GG          B",
+	"B G   B         BB         BB          B",
+	"B             B                  B     B",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
 
 };
 
@@ -37,6 +37,7 @@ public:
 	bool onGround;
 	Sprite sprite;
 	float currentFrame;
+	int coins = 0;
 
 	PLAYER(Texture &image)
 	{
@@ -75,6 +76,12 @@ public:
 					if ((dy<0) && (dir == 1))  { rect.top = i * 32 + 32;   dy = 0; }
 				}
 
+				if (TileMap[i][j] == 'G')
+				{
+					TileMap[i][j] == ' ';
+						coins++;
+				}
+
 			}
 
 	}
@@ -105,7 +112,7 @@ int main()
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		clock.restart();
-		time = time / 400;
+		time = time / 300;
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -137,6 +144,8 @@ int main()
 			for (int j = 0; j<W; j++)
 			{
 				if (TileMap[i][j] == 'B') rectangle.setFillColor(Color::Green);
+
+				if (TileMap[i][j] == 'G') rectangle.setFillColor(Color::Yellow);
 
 				if (TileMap[i][j] == ' ') continue;
 

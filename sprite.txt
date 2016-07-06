@@ -78,8 +78,8 @@ public:
 
 				if (TileMap[i][j] == 'G')
 				{
-					TileMap[i][j] = ' ';
-						coins++;
+				    TileMap[i][j] = ' ';
+					coins++;
 				}
 
 			}
@@ -100,6 +100,12 @@ int main()
 	Texture t;
 	t.loadFromFile("fang.png");
 
+	Font font;
+	font.loadFromFile("CyrilicOld.TTF");
+	Text text("", font, 20);
+	text.setColor(Color::Blue);
+	text.setStyle(Text::Bold);
+
 	float currentFrame = 0;
 
 	PLAYER p(t);
@@ -108,6 +114,8 @@ int main()
 
 	RectangleShape rectangle(Vector2f(32, 32));
 	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
+
+
 	while (window.isOpen())
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
@@ -138,7 +146,7 @@ int main()
 		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
 
 
-		window.clear();
+		window.clear(Color::Black);
 
 		for (int i = 0; i<H; i++)
 			for (int j = 0; j<W; j++)
@@ -153,7 +161,9 @@ int main()
 				window.draw(rectangle);
 			}
 
-
+		text.setString("Coins:");
+		text.setPosition(40, 40);
+		window.draw(text);
 		window.draw(p.sprite);
 		window.display();
 

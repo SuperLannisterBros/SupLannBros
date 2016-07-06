@@ -40,7 +40,7 @@ public:
 	bool onGround;
 	Sprite sprite;
 	float currentFrame;
-	int coins = 0;
+	int coins;
 
 	PLAYER(Texture &image)
 	{
@@ -48,6 +48,7 @@ public:
 		rect = FloatRect(32, 0, 40, 50);
 		dx = dy = 0;
 		currentFrame = 0;
+		coins = 0;
 	}
 	void update(float time)
 	{
@@ -97,7 +98,6 @@ public:
 int main()
 
 {
-
 	RenderWindow window(VideoMode(640, 480), "Game");
 
 	Texture t;
@@ -114,6 +114,8 @@ int main()
 	PLAYER p(t);
 
 	Clock clock;
+	Clock GameTimeClock;
+	int GameTime = 0;
 
 	RectangleShape rectangle(Vector2f(32, 32));
 	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
@@ -122,6 +124,7 @@ int main()
 	while (window.isOpen())
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
+		GameTime = GameTimeClock.getElapsedTime().asSeconds();
 		clock.restart();
 		time = time / 300;
 		Event event;
@@ -164,15 +167,16 @@ int main()
 				window.draw(rectangle);
 			}
 
-		ostringstream CoinsString;
+		ostringstream CoinsString,GameTimeString;
 		CoinsString << p.coins;
-		text.setString("Coins: " + CoinsString.str());
+		GameTimeString << 300-GameTime;
+
+		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str());
 		text.setPosition(40, 40);
 		window.draw(text);
 
 		window.draw(p.sprite);
 		window.display();
-
 
 	}
 

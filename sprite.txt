@@ -78,7 +78,7 @@ public:
 
 				if (TileMap[i][j] == 'G')
 				{
-					TileMap[i][j] == ' ';
+					TileMap[i][j] = ' ';
 						coins++;
 				}
 

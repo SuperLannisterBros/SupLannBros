@@ -115,6 +115,7 @@ int main()
 	Text text("", font, 20);
 	text.setColor(Color::Blue);
 	text.setStyle(Text::Bold);
+	const int TimeToPass = 200;
 
 	float currentFrame = 0;
 
@@ -123,7 +124,7 @@ int main()
 	Clock clock;
 	Clock GameTimeClock;
 	int GameTime = 0;
-
+	int LastTime = 0;
 	RectangleShape rectangle(Vector2f(32, 32));
 	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
 
@@ -132,6 +133,11 @@ int main()
 	{
 		float time = clock.getElapsedTime().asMicroseconds();
 		GameTime = GameTimeClock.getElapsedTime().asSeconds();
+		if ((TimeToPass - GameTime) < 0){
+			if (GameTime > LastTime) p.health--;
+			LastTime = GameTime;
+			GameTime = TimeToPass;
+		}
 		clock.restart();
 		time = time / 300;
 		Event event;
@@ -179,7 +185,7 @@ int main()
 		ostringstream CoinsString,GameTimeString,HealthString;
 		CoinsString << p.coins;
 		HealthString << p.health;
-		GameTimeString << 300-GameTime;
+		GameTimeString << TimeToPass - GameTime;
 
 		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str()+ "      Health:" + HealthString.str());
 		text.setPosition(40, 40);

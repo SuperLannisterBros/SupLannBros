@@ -7,7 +7,7 @@ using namespace std;
 
 float offsetX = 0, offsetY = 0;
 
-const int H = 15;
+const int H = 18;
 const int W = 40;
 
 String TileMap[H] = {
@@ -23,10 +23,13 @@ String TileMap[H] = {
 	"B          GG                          B",
 	"B                     B    GG          B",
 	"B G   B         BB         BB          B",
+	"B                               B      B",
 	"B             B                  B     B",
+	"B       B     B                  B     B",
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
 	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 
 };
 
@@ -37,13 +40,15 @@ class PLAYER {
 public:
 	float dx, dy;
 	FloatRect rect;
-	bool onGround;
+	bool onGround,life;
 	Sprite sprite;
 	float currentFrame;
-	int coins;
+	int coins,health;
 
 	PLAYER(Texture &image)
 	{
+		health = 100;
+		life = true;
 		sprite.setTexture(image);
 		rect = FloatRect(32, 0, 40, 50);
 		dx = dy = 0;
@@ -65,6 +70,7 @@ public:
 
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
+		if (health <= 0) life = false;
 	}
 
 	void Collision(int dir)
@@ -134,17 +140,19 @@ int main()
 				window.close();
 		}
 
-		if (Keyboard::isKeyPressed(Keyboard::Left))
-		{
-			p.dx = -0.1;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Right))
-		{
-			p.dx = 0.1;
-		}
-		if (Keyboard::isKeyPressed(Keyboard::Up))
-		{
-			if (p.onGround) { p.dy = -0.4; p.onGround = false; }
+		if (p.life){
+			if (Keyboard::isKeyPressed(Keyboard::Left))
+			{
+				p.dx = -0.1;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Right))
+			{
+				p.dx = 0.1;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Up))
+			{
+				if (p.onGround) { p.dy = -0.4; p.onGround = false; }
+			}
 		}
 
 		p.update(time);
@@ -167,11 +175,12 @@ int main()
 				window.draw(rectangle);
 			}
 
-		ostringstream CoinsString,GameTimeString;
+		ostringstream CoinsString,GameTimeString,HealthString;
 		CoinsString << p.coins;
+		HealthString << p.health;
 		GameTimeString << 300-GameTime;
 
-		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str());
+		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str()+ "      Health:" + HealthString.str());
 		text.setPosition(40, 40);
 		window.draw(text);
 

@@ -70,6 +70,7 @@ public:
 
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
+		if (rect.top > 420) health = 0;
 		if (health <= 0) life = false;
 	}
 

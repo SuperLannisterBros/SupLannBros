@@ -1,0 +1,225 @@
+#include <SFML/Graphics.hpp>
+#include <iostream>
+#include <sstream>
+
+using namespace sf;
+using namespace std;
+
+float offsetX = 0, offsetY = 96;
+
+const int H = 21;
+const int W = 240;
+
+String TileMap[H] = {
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                G                                                                                                                                                             B",
+	"B                                                                               BBBB                                                                                                                                                           B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                         BB                                                                                                                                                                   B",
+	"B                                                                    G                      G                                                            G  BB                                                                                 B",
+	"B                          G                                       BBBB                   BBBB    GG                                               G  BB                                                                                       B",
+	"B                          BB                                                                                                                    BB                                                                                            B",
+	"B                                G                                                                                                                                                      BBBBB  BBBBB                                           B",
+	"B                     V         BB          BB                 BBBBBBBBBB      BB                               BB         BB               BBB                      BBB              BB     G      BB                       B                 B",
+	"B                   BBB                                                        BB                  G            BB         BB               BBBB                     BBB            BB       G        BB                     B                 B",
+	"B                   BBB          G       G      G                              BB          GG                   BB     G   BB               BBBB                     BBB          BB         G          BB                   B                 B",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBB         B            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBB         B            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBB         B            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+
+};
+
+
+
+int ground = 398;
+class PLAYER {
+public:
+	float dx, dy;
+	FloatRect rect;
+	bool onGround, life;
+	Sprite sprite;
+	float currentFrame;
+	int coins, health;
+
+	PLAYER(Texture &image)
+	{
+		health = 100;
+		life = true;
+		sprite.setTexture(image);
+		rect = FloatRect(40, 40, 40, 50);
+		dx = dy = 0;
+		currentFrame = 0;
+		coins = 0;
+	}
+	void update(float time)
+	{
+		rect.left += dx*time;
+		Collision(0);
+		if (!onGround) dy = dy + 0.00005*time * 10;
+		rect.top += dy*time;
+		onGround = false;
+		Collision(1);
+		currentFrame += 0.005*time;
+		if (currentFrame > 6) currentFrame -= 6;
+		if (dx>0) sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
+		if (dx<0) sprite.setTextureRect(IntRect(40 * int(currentFrame) + 40, 244, -40, 50));
+
+		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
+		dx = 0;
+		if (rect.top > 580) health = 0;
+		if (health <= 0) {
+			life = false;
+			health = 0;
+		}
+	}
+
+	void Collision(int dir)
+	{
+		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
+			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
+			{
+				if (TileMap[i][j] == 'B')
+				{
+					if ((dx>0) && (dir == 0)) rect.left = j * 32 - rect.width;
+					if ((dx<0) && (dir == 0)) rect.left = j * 32 + 32;
+					if ((dy>0) && (dir == 1))  { rect.top = i * 32 - rect.height;  dy = 0;   onGround = true; }
+					if ((dy<0) && (dir == 1))  { rect.top = i * 32 + 32;   dy = 0; }
+				}
+
+				if (TileMap[i][j] == 'G')
+				{
+					TileMap[i][j] = ' ';
+					coins++;
+				}
+
+				if (TileMap[i][j] == 'V')
+				{
+					TileMap[i][j] = ' ';
+
+				}
+
+
+
+
+
+
+			}
+
+	}
+
+
+};
+
+
+
+int main()
+
+{
+	RenderWindow window(VideoMode(640, 480), "Game");
+
+	Texture t, old_t;
+	t.loadFromFile("Texture.png");
+	old_t.loadFromFile("Fang.png");
+
+	Sprite tile(t);
+
+	Font font;
+	font.loadFromFile("CyrilicOld.TTF");
+	Text text("", font, 20);
+	text.setColor(Color::Blue);
+	text.setStyle(Text::Bold);
+	const int TimeToPass = 200;
+
+	float currentFrame = 0;
+
+	PLAYER p(old_t);
+
+	Clock clock;
+	Clock GameTimeClock;
+	int GameTime = 0;
+	int LastTime = 0;
+	RectangleShape rectangle(Vector2f(32, 32));
+
+
+	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
+
+	while (window.isOpen())
+	{
+		double time = clock.getElapsedTime().asMicroseconds();
+		GameTime = GameTimeClock.getElapsedTime().asSeconds();
+		if ((TimeToPass - GameTime) < 0){
+			if (GameTime > LastTime) p.health--;
+			LastTime = GameTime;
+			GameTime = TimeToPass;
+		}
+		clock.restart();
+		time = time / 500;                 
+		Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed)
+				window.close();
+		}
+
+		if (p.life){
+			if (Keyboard::isKeyPressed(Keyboard::Left))
+			{
+				p.dx = -0.1;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Right))
+			{
+				p.dx = 0.1;
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Space))
+			{
+				if (p.onGround) { p.dy = -0.4; p.onGround = false; }
+			}
+		}
+
+		p.update(time);
+
+		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
+
+		window.clear(Color::Black);
+
+		for (int i = 0; i<H; i++)
+			for (int j = 0; j<W; j++)
+			{
+				if (TileMap[i][j] == 'B') rectangle.setFillColor(Color::Green); //зеленый квадрат
+				//if (TileMap[i][j] == 'B') tile.setTextureRect(IntRect(312, 36, 32, 32));
+
+				if (TileMap[i][j] == 'V') rectangle.setFillColor(Color::Red);
+
+				if (TileMap[i][j] == 'G') rectangle.setFillColor(Color::Yellow);
+
+				if (TileMap[i][j] == ' ') continue;
+
+				rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+				window.draw(rectangle);
+				//tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+				//window.draw(tile);
+			}
+
+		ostringstream CoinsString, GameTimeString, HealthString;
+		CoinsString << p.coins;
+		HealthString << p.health;
+		GameTimeString << TimeToPass - GameTime;
+
+		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str() + "      Health:" + HealthString.str());
+		text.setPosition(40, 40);
+		window.draw(text);
+
+		window.draw(p.sprite);
+		window.display();
+
+	}
+
+	return 0;
+
+}

@@ -5,31 +5,33 @@
 using namespace sf;
 using namespace std;
 
-float offsetX = 0, offsetY = 0;
+float offsetX = 0, offsetY = 96;
 
-const int H = 18;
-const int W = 40;
+const int H = 21;
+const int W = 240;
 
 String TileMap[H] = {
-
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"B                                      B",
-	"B                    GG                B",
-	"B                G   BB                B",
-	"B            G              B   B      B",
-	"B         BBBB                         B",
-	"B                                      B",
-	"BBB               B                    B",
-	"B          GG                          B",
-	"B                     B    GG          B",
-	"B G   B         BB         BB          B",
-	"B                               B      B",
-	"B             B                  B     B",
-	"B       B     B                  B     B",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                                G                                                                                                                                                             B",
+	"B                                                                               BBBB                                                                                                                                                           B",
+	"B                                                                                                                                                                                                                                              B",
+	"B                                                                         BB                                                                                                                                                                   B",
+	"B                                                                    G                      G                                                            G  BB                                                                                 B",                                                                                                                                                                                                           
+	"B                          G                                       BBBB                   BBBB    GG                                               G  BB                                                                                       B",
+	"B                          BB                                                                                                                    BB                                                                                            B",
+	"B                                G                                                                                                                                                                                                             B",
+	"B                               BB          BB                 BBBBBBBBBB      BB                               BB         BB               BBB                      BBB                                                                       B",
+	"B                   BBB                                                        BB                  G            BB         BB               BBBB                     BBB                                                                       B",
+	"B                   BBB          G       G      G                              BB          GG                   BB     G   BB               BBBB                     BBB                                                                       B",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
 
 };
 
@@ -70,7 +72,7 @@ public:
 
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
-		if (rect.top > 420) health = 0;
+		if (rect.top > 516) health = 0;
 		if (health <= 0) {
 			life = false;
 			health = 0;
@@ -168,7 +170,6 @@ int main()
 		p.update(time);
 
 		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
-
 
 		window.clear(Color::Black);
 

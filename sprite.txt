@@ -40,17 +40,17 @@ class PLAYER {
 public:
 	float dx, dy;
 	FloatRect rect;
-	bool onGround,life;
+	bool onGround, life;
 	Sprite sprite;
 	float currentFrame;
-	int coins,health;
+	int coins, health;
 
 	PLAYER(Texture &image)
 	{
 		health = 100;
 		life = true;
 		sprite.setTexture(image);
-		rect = FloatRect(32, 0, 40, 50);
+		rect = FloatRect(40, 40, 40, 50);
 		dx = dy = 0;
 		currentFrame = 0;
 		coins = 0;
@@ -71,7 +71,10 @@ public:
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
 		if (rect.top > 420) health = 0;
-		if (health <= 0) life = false;
+		if (health <= 0) {
+			life = false;
+			health = 0;
+		}
 	}
 
 	void Collision(int dir)
@@ -89,7 +92,7 @@ public:
 
 				if (TileMap[i][j] == 'G')
 				{
-				    TileMap[i][j] = ' ';
+					TileMap[i][j] = ' ';
 					coins++;
 				}
 
@@ -131,7 +134,7 @@ int main()
 
 	while (window.isOpen())
 	{
-		float time = clock.getElapsedTime().asMicroseconds();
+		double time = clock.getElapsedTime().asMicroseconds();
 		GameTime = GameTimeClock.getElapsedTime().asSeconds();
 		if ((TimeToPass - GameTime) < 0){
 			if (GameTime > LastTime) p.health--;
@@ -139,7 +142,7 @@ int main()
 			GameTime = TimeToPass;
 		}
 		clock.restart();
-		time = time / 300;
+		time = time / 500;                 // Баг с временм
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -156,7 +159,7 @@ int main()
 			{
 				p.dx = 0.1;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Up))
+			if (Keyboard::isKeyPressed(Keyboard::Space))
 			{
 				if (p.onGround) { p.dy = -0.4; p.onGround = false; }
 			}
@@ -182,12 +185,12 @@ int main()
 				window.draw(rectangle);
 			}
 
-		ostringstream CoinsString,GameTimeString,HealthString;
+		ostringstream CoinsString, GameTimeString, HealthString;
 		CoinsString << p.coins;
 		HealthString << p.health;
 		GameTimeString << TimeToPass - GameTime;
 
-		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str()+ "      Health:" + HealthString.str());
+		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str() + "      Health:" + HealthString.str());
 		text.setPosition(40, 40);
 		window.draw(text);
 

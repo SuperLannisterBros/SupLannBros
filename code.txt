@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 using namespace sf;
 using namespace std;
@@ -10,53 +11,58 @@ float offsetX = 0, offsetY = 96;
 const int H = 21;
 const int W = 240;
 
-String TileMap[H] = {
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                                G                                                                                                                                                             B",
-	"B                                                                               BBBB                                                                                                                                                           B",
-	"B                                                                                                                                                                                                                                              B",
-	"B                                                                         BB                                                                                                                                                                   B",
-	"B                                                                    G                      G                                                            G  BB                                                                                 B",
-	"B                          G                                       BBBB                   BBBB    GG                                               G  BB                                                                                       B",
-	"B                          BB                                                                                                                    BB                                                                                            B",
-	"B                                G                                                                                                                                                      BBBBB  BBBBB                                           B",
-	"B                     V         BB          BB                 BBBBBBBBBB      BB                               BB         BB               BBB                      BBB              BB     G      BB                       B                 B",
-	"B                   BBB                                                        BB                  G            BB         BB               BBBB                     BBB            BB       G        BB                     B                 B",
-	"B                   BBB          G       G      G                              BB          GG                   BB     G   BB               BBBB                     BBB          BB         G          BB                   B                 B",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBB         B            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBB         B            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB  BBBBBBBBBBBBBBBB   BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBBB    BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB   BBBBBBB     BBBBBBB         B            BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-	"BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-
-};
-
-
+String TileMap[H] = {};
 
 int ground = 398;
 class PLAYER {
 public:
+	int level;
 	float dx, dy;
 	FloatRect rect;
 	bool onGround, life;
 	Sprite sprite;
 	float currentFrame;
 	int coins, health;
+	bool facingRight;
 
 	PLAYER(Texture &image)
 	{
+		level = 1;
 		health = 100;
 		life = true;
 		sprite.setTexture(image);
-		rect = FloatRect(40, 40, 40, 50);
+		rect = FloatRect(275, 215, 32, 32);
 		dx = dy = 0;
 		currentFrame = 0;
 		coins = 0;
+		facingRight = true;
+		NextLevel(level);
 	}
+
+	bool NextLevel(int levelNumber)
+	{
+		string buffer;
+		string fileName;
+		ifstream levelFile;
+		fileName += levelNumber+'0';
+		fileName += ".txt";
+		levelFile.open(fileName);
+		if (!levelFile.is_open()) // если файл не открыт
+			cout << "gavnicho!\n"; // сообщить об этом
+
+			cout << fileName;
+		
+		for (int i = 0; i < H; i++)
+		{
+			getline(levelFile, buffer);
+			TileMap[i] = buffer;
+		}
+		dx = dy = 0;
+		facingRight = true;
+		currentFrame = 0;
+		return !levelFile.is_open();
+	}
+
 	void update(float time)
 	{
 		rect.left += dx*time;
@@ -66,9 +72,27 @@ public:
 		onGround = false;
 		Collision(1);
 		currentFrame += 0.005*time;
-		if (currentFrame > 6) currentFrame -= 6;
-		if (dx>0) sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
-		if (dx<0) sprite.setTextureRect(IntRect(40 * int(currentFrame) + 40, 244, -40, 50));
+		if (currentFrame > 2) currentFrame -= 2;
+		if (dx > 0) {
+			sprite.setTextureRect(IntRect(275 + 55 * int(currentFrame), 215, 32, 32));
+			facingRight = true;
+		}
+
+		if (dx < 0) {
+			sprite.setTextureRect(IntRect(275 + 55 * int(currentFrame) + 32, 215, -32, 32));
+			facingRight = false;
+		}
+
+		if (dy != 0) if (dx>0) sprite.setTextureRect(IntRect(375, 215, 32, 32));
+		else sprite.setTextureRect(IntRect(407, 215, -32, 32));
+
+		if (dx == 0)
+		{
+			if (facingRight) sprite.setTextureRect(IntRect(336, 263, 32, 32));
+			else sprite.setTextureRect(IntRect(368, 263, -32, 32));
+
+		}
+
 
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 		dx = 0;
@@ -84,12 +108,13 @@ public:
 		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
 			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
 			{
+				
 				if (TileMap[i][j] == 'B')
 				{
 					if ((dx>0) && (dir == 0)) rect.left = j * 32 - rect.width;
 					if ((dx<0) && (dir == 0)) rect.left = j * 32 + 32;
-					if ((dy>0) && (dir == 1))  { rect.top = i * 32 - rect.height;  dy = 0;   onGround = true; }
-					if ((dy<0) && (dir == 1))  { rect.top = i * 32 + 32;   dy = 0; }
+					if ((dy>0) && (dir == 1)) { rect.top = i * 32 - rect.height;  dy = 0;   onGround = true; }
+					if ((dy<0) && (dir == 1)) { rect.top = i * 32 + 32;   dy = 0; }
 				}
 
 				if (TileMap[i][j] == 'G')
@@ -101,19 +126,20 @@ public:
 				if (TileMap[i][j] == 'V')
 				{
 					TileMap[i][j] = ' ';
-
+					health += 25;
 				}
 
-
-
-
-
-
+				if (TileMap[i][j] == 'E')
+				{
+					level++;
+					NextLevel(level);
+					if (!NextLevel(level))
+					{
+						cout << "gameover!\n"; 
+					}
+				}
 			}
-
 	}
-
-
 };
 
 
@@ -121,13 +147,18 @@ public:
 int main()
 
 {
-	RenderWindow window(VideoMode(640, 480), "Game");
+	RenderWindow window(VideoMode(640, 480), "Game Of Thrones");
+
+	Image image;
+	image.loadFromFile("Texture.png");
+	image.createMaskFromColor(Color(255, 128, 128));
 
 	Texture t, old_t;
-	t.loadFromFile("Texture.png");
+	t.loadFromImage(image);
 	old_t.loadFromFile("Fang.png");
 
-	Sprite tile(t);
+	Sprite tile;
+	tile.setTexture(t);
 
 	Font font;
 	font.loadFromFile("CyrilicOld.TTF");
@@ -138,7 +169,7 @@ int main()
 
 	float currentFrame = 0;
 
-	PLAYER p(old_t);
+	PLAYER p(t);
 
 	Clock clock;
 	Clock GameTimeClock;
@@ -153,13 +184,13 @@ int main()
 	{
 		double time = clock.getElapsedTime().asMicroseconds();
 		GameTime = GameTimeClock.getElapsedTime().asSeconds();
-		if ((TimeToPass - GameTime) < 0){
+		if ((TimeToPass - GameTime) < 0) {
 			if (GameTime > LastTime) p.health--;
 			LastTime = GameTime;
 			GameTime = TimeToPass;
 		}
 		clock.restart();
-		time = time / 500;                 
+		time = time / 500;
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -167,7 +198,7 @@ int main()
 				window.close();
 		}
 
-		if (p.life){
+		if (p.life) {
 			if (Keyboard::isKeyPressed(Keyboard::Left))
 			{
 				p.dx = -0.1;
@@ -189,29 +220,36 @@ int main()
 		window.clear(Color::Black);
 
 		for (int i = 0; i<H; i++)
-			for (int j = 0; j<W; j++)
+			for (int j = 0; j < W; j++)
 			{
-				if (TileMap[i][j] == 'B') rectangle.setFillColor(Color::Green); //зеленый квадрат
-				//if (TileMap[i][j] == 'B') tile.setTextureRect(IntRect(312, 36, 32, 32));
+				if (TileMap[i][j] == 'B'){
+					rectangle.setFillColor(Color::Green);
+					//tile.setTextureRect(IntRect(312, 36, 32, 32));
+					//tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					//window.draw(tile);
+					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					window.draw(rectangle);
+				}
 
-				if (TileMap[i][j] == 'V') rectangle.setFillColor(Color::Red);
-
-				if (TileMap[i][j] == 'G') rectangle.setFillColor(Color::Yellow);
-
-				if (TileMap[i][j] == ' ') continue;
-
+				if (TileMap[i][j] == 'V') {
+					rectangle.setFillColor(Color::Red);
+					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					window.draw(rectangle);
+				}
+				if (TileMap[i][j] == 'G') {rectangle.setFillColor(Color::Yellow);
 				rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 				window.draw(rectangle);
-				//tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-				//window.draw(tile);
+			}
+				if (TileMap[i][j] == ' ') continue;
 			}
 
-		ostringstream CoinsString, GameTimeString, HealthString;
+		ostringstream CoinsString, GameTimeString, HealthString, LevelString;
 		CoinsString << p.coins;
 		HealthString << p.health;
 		GameTimeString << TimeToPass - GameTime;
+		LevelString << p.level;
 
-		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str() + "      Health:" + HealthString.str());
+		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str() + "      Health:" + HealthString.str() + "      Level:" + LevelString.str());
 		text.setPosition(40, 40);
 		window.draw(text);
 

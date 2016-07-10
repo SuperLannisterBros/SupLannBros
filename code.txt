@@ -19,14 +19,17 @@ public:
 	int level;
 	float dx, dy;
 	FloatRect rect;
-	bool onGround, life;
+	bool onGround, life, alcoholism;
 	Sprite sprite;
 	float currentFrame;
 	int coins, health;
 	bool facingRight;
+	int TimeSpeed;
+	string EffectName;
 
 	PLAYER(Texture &image)
 	{
+		TimeSpeed = 500;
 		level = 1;
 		health = 100;
 		life = true;
@@ -41,6 +44,7 @@ public:
 
 	bool NextLevel(int levelNumber)
 	{
+		alcoholism = false;
 		string buffer;
 		string fileName;
 		ifstream levelFile;
@@ -126,7 +130,10 @@ public:
 				if (TileMap[i][j] == 'V')
 				{
 					TileMap[i][j] = ' ';
-					health += 25;
+					health += 30;
+					if (alcoholism == true) Vine();
+					alcoholism = true;
+					
 				}
 
 				if (TileMap[i][j] == 'E')
@@ -140,6 +147,33 @@ public:
 				}
 			}
 	}
+
+	void Vine()
+	{
+		int effect = rand()%5+1;
+		switch (effect)
+		{
+		case 1:
+			TimeSpeed = 1000;
+			EffectName = "Slow";
+			break;
+		case 2:
+			TimeSpeed = 300;
+			EffectName = "Fast";
+			break;
+		case 3:
+			EffectName = "Poisoning";
+			break;
+		case 4:
+			EffectName = "A scanner darkly";
+			break;
+		case 5:
+			EffectName = "healing";
+			break;
+		default:
+			break;
+		}
+	}
 };
 
 
@@ -147,6 +181,7 @@ public:
 int main()
 
 {
+
 	RenderWindow window(VideoMode(640, 480), "Game Of Thrones");
 
 	Image image;
@@ -182,6 +217,10 @@ int main()
 
 	while (window.isOpen())
 	{
+
+
+
+
 		double time = clock.getElapsedTime().asMicroseconds();
 		GameTime = GameTimeClock.getElapsedTime().asSeconds();
 		if ((TimeToPass - GameTime) < 0) {
@@ -190,7 +229,7 @@ int main()
 			GameTime = TimeToPass;
 		}
 		clock.restart();
-		time = time / 500;
+		time = time / p.TimeSpeed;
 		Event event;
 		while (window.pollEvent(event))
 		{
@@ -243,13 +282,13 @@ int main()
 				if (TileMap[i][j] == ' ') continue;
 			}
 
-		ostringstream CoinsString, GameTimeString, HealthString, LevelString;
+		ostringstream CoinsString, GameTimeString, HealthString, LevelString,AlcoEffect;
 		CoinsString << p.coins;
 		HealthString << p.health;
 		GameTimeString << TimeToPass - GameTime;
 		LevelString << p.level;
-
-		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str() + "      Health:" + HealthString.str() + "      Level:" + LevelString.str());
+		AlcoEffect << p.EffectName;
+		text.setString("Coins: " + CoinsString.str() + "      Time:" + GameTimeString.str() + "      Health:" + HealthString.str() + "      Level:" + LevelString.str() + "      " + AlcoEffect.str());
 		text.setPosition(40, 40);
 		window.draw(text);
 

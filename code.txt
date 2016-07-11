@@ -81,7 +81,7 @@ public:
 		health = 100;
 		life = true;
 		sprite.setTexture(image);
-		rect = FloatRect(175, 215, 32, 32);
+		rect = FloatRect(400, 215, 32, 32);
 		dx = dy = 0;
 		currentFrame = 0;
 		coins = 0;
@@ -289,10 +289,8 @@ public:
 
 };
 
-int main()
 
-{
-
+bool StartGame(){
 	RenderWindow window(VideoMode(640, 480), "Game Of Thrones");
 	menu(window);
 
@@ -308,7 +306,9 @@ int main()
 
 	Font font;
 	font.loadFromFile("CyrilicOld.TTF");
-	Text text("", font, 20);
+	Text text("", font, 20), diedtext("", font, 40);
+	diedtext.setColor(Color::Red);
+	diedtext.setStyle(Text::Bold);
 	text.setColor(Color::Blue);
 	text.setStyle(Text::Bold);
 	const int TimeToPass = 120;
@@ -317,8 +317,8 @@ int main()
 
 	PLAYER p(t);
 
-	ENEMY enemy; 
-	enemy.set(t,12*32,16*32);
+	ENEMY enemy;
+	enemy.set(t, 2 * 32, 16 * 32);
 
 	Clock clock;
 	Clock GameTimeClock;
@@ -347,7 +347,7 @@ int main()
 			if (GameTime > LastTime2) {
 				p.EffectTime--;
 				p.health += p.Poisoning;
-				LastTime2 = GameTime;	
+				LastTime2 = GameTime;
 			}
 			if (p.EffectTime <= 0) {
 				p.effect = false;
@@ -389,6 +389,9 @@ int main()
 			}
 		}
 
+		if (Keyboard::isKeyPressed(Keyboard::Escape)) return true;
+
+
 		p.update(time);
 		enemy.update(time);
 
@@ -397,7 +400,7 @@ int main()
 		{
 			if (enemy.life) {
 				if (p.dy>0) { enemy.dx = 0; p.dy = -0.2; enemy.life = false; }
-				else p.health-=1;
+				else p.health -= 1;
 			}
 		}
 
@@ -425,19 +428,20 @@ int main()
 					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 					window.draw(rectangle);
 				}
-               	//if (TileMap[i][j] == 'G') {
+				//if (TileMap[i][j] == 'G') {
 				//	tile.setTextureRect(IntRect(245, 40, 32, 32));
 				//	tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 				//	window.draw(tile);
 				//}
-				if (TileMap[i][j] == 'G') {rectangle.setFillColor(Color::Yellow);
-				rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-				window.draw(rectangle);
-			}
+				if (TileMap[i][j] == 'G') {
+					rectangle.setFillColor(Color::Yellow);
+					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					window.draw(rectangle);
+				}
 				if (TileMap[i][j] == ' ') continue;
 			}
 
-		ostringstream CoinsString, GameTimeString, HealthString, LevelString,AlcoEffect;
+		ostringstream CoinsString, GameTimeString, HealthString, LevelString, AlcoEffect;
 		CoinsString << p.coins;
 		HealthString << p.health;
 		GameTimeString << TimeToPass - GameTime;
@@ -449,10 +453,26 @@ int main()
 
 		window.draw(p.sprite);
 		window.draw(enemy.sprite);
+
+		if (!p.life){
+			window.clear(Color::Black);
+			diedtext.setString("You Died");
+			diedtext.setPosition(240, 200);
+			window.draw(diedtext);
+		}
+
 		window.display();
 
 	}
+}
 
+void GameRun(){
+	if (StartGame()) GameRun();
+}
+
+int main()
+
+{
+	GameRun();
 	return 0;
-
 }

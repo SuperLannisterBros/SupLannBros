@@ -19,16 +19,17 @@ public:
 	int level;
 	float dx, dy;
 	FloatRect rect;
-	bool onGround, life, alcoholism;
+	bool onGround, life, alcoholism,effect;
 	Sprite sprite;
 	float currentFrame;
-	int coins, health;
+	int coins, health, Poisoning;
 	bool facingRight;
-	int TimeSpeed;
+	int TimeSpeed, EffectTime;
 	string EffectName;
 
 	PLAYER(Texture &image)
 	{
+		effect = false;
 		TimeSpeed = 500;
 		level = 1;
 		health = 100;
@@ -130,8 +131,8 @@ public:
 				if (TileMap[i][j] == 'V')
 				{
 					TileMap[i][j] = ' ';
-					health += 30;
 					if (alcoholism == true) Vine();
+					else health += 30;
 					alcoholism = true;
 					
 				}
@@ -150,8 +151,11 @@ public:
 
 	void Vine()
 	{
-		int effect = rand()%5+1;
-		switch (effect)
+		TimeSpeed = 500;
+		Poisoning = 0;
+		EffectTime = 10;
+		effect = true;
+		switch (rand() % 5 + 1)
 		{
 		case 1:
 			TimeSpeed = 1000;
@@ -163,12 +167,14 @@ public:
 			break;
 		case 3:
 			EffectName = "Poisoning";
+			Poisoning = -5;
 			break;
 		case 4:
 			EffectName = "A scanner darkly";
 			break;
 		case 5:
 			EffectName = "healing";
+			Poisoning=5;
 			break;
 		default:
 			break;
@@ -176,6 +182,67 @@ public:
 	}
 };
 
+class ENEMY
+{
+
+public:
+	float dx, dy;
+	FloatRect rect;
+	Sprite sprite;
+	float currentFrame;
+	bool life;
+
+
+	void set(Texture &image, int x, int y)
+	{
+		sprite.setTexture(image);
+		rect = FloatRect(245, 100, 60, 30);
+
+		dx = 0.05;
+		currentFrame = 0;
+		life = true;
+	}
+
+	void update(float time)
+	{
+		rect.left += dx * time;
+
+		Collision();
+
+
+		currentFrame += time * 0.005;
+		if (currentFrame >= 2) currentFrame -= 2;
+		if (dx>0) sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
+		if (dx<0) sprite.setTextureRect(IntRect(40 * int(currentFrame) + 60, 244, -40, 50));
+		sprite.setTextureRect(IntRect(18 * int(currentFrame), 0, 16, 16));
+		if (!life) sprite.setTextureRect(IntRect(58, 0, 16, 16));
+
+
+		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
+
+	}
+
+
+	void Collision()
+	{
+
+		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
+			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
+				if (TileMap[i][j] == 'B')
+				{
+					if (dx>0)
+					{
+						rect.left = j * 16 - rect.width; dx *= -1;
+					}
+					else if (dx<0)
+					{
+						rect.left = j * 16 + 16; dx *= -1;
+					}
+
+				}
+	}
+
+};
 
 
 int main()
@@ -205,11 +272,14 @@ int main()
 	float currentFrame = 0;
 
 	PLAYER p(t);
+	ENEMY enemy; 
+	enemy.set(t,50*32,50*32);
 
 	Clock clock;
 	Clock GameTimeClock;
 	int GameTime = 0;
 	int LastTime = 0;
+	int LastTime2 = 0;
 	RectangleShape rectangle(Vector2f(32, 32));
 
 
@@ -223,11 +293,30 @@ int main()
 
 		double time = clock.getElapsedTime().asMicroseconds();
 		GameTime = GameTimeClock.getElapsedTime().asSeconds();
+
+		if (p.effect) {
+			if (GameTime > LastTime2) {
+				p.EffectTime--;
+				p.health += p.Poisoning;
+				LastTime2 = GameTime;
+			}
+			if (p.EffectTime <= 0) {
+				p.effect = false;
+				p.EffectName = ' ';
+				p.TimeSpeed = 500;
+			}
+		}
+
 		if ((TimeToPass - GameTime) < 0) {
 			if (GameTime > LastTime) p.health--;
 			LastTime = GameTime;
 			GameTime = TimeToPass;
 		}
+
+
+
+
+
 		clock.restart();
 		time = time / p.TimeSpeed;
 		Event event;
@@ -253,6 +342,7 @@ int main()
 		}
 
 		p.update(time);
+		enemy.update(time);
 
 		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
 

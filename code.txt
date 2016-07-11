@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <sstream>
@@ -65,7 +66,7 @@ public:
 	int level;
 	float dx, dy;
 	FloatRect rect;
-	bool onGround, life, alcoholism,effect;
+	bool onGround, life, alcoholism, effect,spawnWolf;
 	Sprite sprite;
 	float currentFrame;
 	int coins, health, Poisoning;
@@ -91,18 +92,19 @@ public:
 
 	bool NextLevel(int levelNumber)
 	{
+		spawnWolf = true;
 		alcoholism = false;
 		string buffer;
 		string fileName;
 		ifstream levelFile;
-		fileName += levelNumber+'0';
+		fileName += levelNumber + '0';
 		fileName += ".txt";
 		levelFile.open(fileName);
 		if (!levelFile.is_open()) // если файл не открыт
 			cout << "gavnicho!\n"; // сообщить об этом
 
-			cout << fileName;
-		
+		cout << fileName;
+
 		for (int i = 0; i < H; i++)
 		{
 			getline(levelFile, buffer);
@@ -159,7 +161,7 @@ public:
 		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
 			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
 			{
-				
+
 				if (TileMap[i][j] == 'B')
 				{
 					if ((dx>0) && (dir == 0)) rect.left = j * 32 - rect.width;
@@ -180,7 +182,7 @@ public:
 					if (alcoholism == true) Vine();
 					else health += 30;
 					alcoholism = true;
-					
+
 				}
 
 				if (TileMap[i][j] == 'E')
@@ -189,7 +191,7 @@ public:
 					NextLevel(level);
 					if (!NextLevel(level))
 					{
-						cout << "gameover!\n"; 
+						cout << "gameover!\n";
 					}
 				}
 			}
@@ -222,7 +224,7 @@ public:
 			break;
 		case 5:
 			EffectName = "healing";
-			Poisoning=5;
+			Poisoning = 5;
 			break;
 		default:
 			break;
@@ -257,8 +259,8 @@ public:
 		currentFrame += time * 0.005;
 
 		if (currentFrame >= 2) currentFrame -= 2;
-		if (dx>0) sprite.setTextureRect(IntRect(249+67 * int(currentFrame), 101, 64, 32));
-		if (dx<0) sprite.setTextureRect(IntRect(249+67 * int(currentFrame) + 64, 101, -64, 32));
+		if (dx>0) sprite.setTextureRect(IntRect(249 + 67 * int(currentFrame), 101, 64, 32));
+		if (dx<0) sprite.setTextureRect(IntRect(249 + 67 * int(currentFrame) + 64, 101, -64, 32));
 
 		if (!life) sprite.setTextureRect(IntRect(577, 321, 64, 32));
 
@@ -286,11 +288,12 @@ public:
 
 				}
 	}
-
 };
 
 
+
 bool StartGame(){
+
 	RenderWindow window(VideoMode(640, 480), "Game Of Thrones");
 	menu(window);
 
@@ -317,8 +320,10 @@ bool StartGame(){
 
 	PLAYER p(t);
 
-	ENEMY enemy;
-	enemy.set(t, 2 * 32, 16 * 32);
+	ENEMY enemy[10];
+
+	
+
 
 	Clock clock;
 	Clock GameTimeClock;
@@ -330,9 +335,20 @@ bool StartGame(){
 
 	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 40, 50));
 
+
+
 	while (window.isOpen())
 	{
-
+		if (p.spawnWolf == true){
+			int k = 0;
+			for (int i = 0; i < H; i++)
+				for (int j = 0; j < W; j++)
+					if (TileMap[i][j] == 'W') {
+						enemy[k].set(t, j * 32, i * 32);
+						k++;
+					}
+			p.spawnWolf = false;
+		}
 
 
 
@@ -393,17 +409,18 @@ bool StartGame(){
 
 
 		p.update(time);
-		enemy.update(time);
+		for (int i = 0; i < 10; i++){
 
-
-		if (p.rect.intersects(enemy.rect))
-		{
-			if (enemy.life) {
-				if (p.dy>0) { enemy.dx = 0; p.dy = -0.2; enemy.life = false; }
-				else p.health -= 1;
+			enemy[i].update(time);
+			if (p.rect.intersects(enemy[i].rect))
+			{
+				if (enemy[i].life) {
+					if (p.dy>0) { enemy[i].dx = 0; p.dy = -0.2; enemy[i].life = false; }
+					else p.health -= 1;
+				}
 			}
 		}
-
+			
 
 
 
@@ -411,33 +428,38 @@ bool StartGame(){
 
 		window.clear(Color::Black);
 
-		for (int i = 0; i<H; i++)
+		for (int i = 0; i < H; i++)
 			for (int j = 0; j < W; j++)
 			{
-				if (TileMap[i][j] == 'B'){
-					rectangle.setFillColor(Color::Green);
-					//tile.setTextureRect(IntRect(312, 36, 32, 32));
-					//tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-					//window.draw(tile);
-					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-					window.draw(rectangle);
+				if (TileMap[i][j] == 'B') {
+					tile.setTextureRect(IntRect(312, 36, 32, 32));
+					tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					window.draw(tile);
 				}
 
+
 				if (TileMap[i][j] == 'V') {
-					rectangle.setFillColor(Color::Red);
-					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-					window.draw(rectangle);
+					tile.setTextureRect(IntRect(428, 33, 32, 32));
+					tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					window.draw(tile);
 				}
-				//if (TileMap[i][j] == 'G') {
-				//	tile.setTextureRect(IntRect(245, 40, 32, 32));
-				//	tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-				//	window.draw(tile);
-				//}
+
+
 				if (TileMap[i][j] == 'G') {
-					rectangle.setFillColor(Color::Yellow);
-					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-					window.draw(rectangle);
+					tile.setTextureRect(IntRect(245, 40, 32, 32));
+					tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+					window.draw(tile);
 				}
+
+
+
+				if (TileMap[i][j] == 'E') {
+					tile.setTextureRect(IntRect(573, 43, 111, 217));
+					tile.setPosition(j * 32 - offsetX - 79, i * 32 - offsetY - 185);
+					window.draw(tile);
+				}
+
+
 				if (TileMap[i][j] == ' ') continue;
 			}
 
@@ -452,7 +474,8 @@ bool StartGame(){
 		window.draw(text);
 
 		window.draw(p.sprite);
-		window.draw(enemy.sprite);
+
+		for (int i = 0; i < 10; i++) window.draw(enemy[i].sprite);
 
 		if (!p.life){
 			window.clear(Color::Black);

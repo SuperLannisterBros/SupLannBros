@@ -35,7 +35,7 @@ public:
 		health = 100;
 		life = true;
 		sprite.setTexture(image);
-		rect = FloatRect(275, 215, 32, 32);
+		rect = FloatRect(175, 215, 32, 32);
 		dx = dy = 0;
 		currentFrame = 0;
 		coins = 0;
@@ -184,6 +184,64 @@ public:
 	}
 };
 
+class ENEMY
+{
+
+public:
+	float dx, dy;
+	FloatRect rect;
+	Sprite sprite;
+	float currentFrame;
+	bool life;
+
+
+	void set(Texture &image, int x, int y)
+	{
+		sprite.setTexture(image);
+		rect = FloatRect(x, y, 64, 32);
+		dx = 0.05;
+		currentFrame = 0;
+		life = true;
+	}
+
+	void update(float time)
+	{
+		rect.left += dx * time;
+		Collision();
+		currentFrame += time * 0.005;
+
+		if (currentFrame >= 2) currentFrame -= 2;
+		if (dx>0) sprite.setTextureRect(IntRect(249+67 * int(currentFrame), 101, 64, 32));
+		if (dx<0) sprite.setTextureRect(IntRect(249+67 * int(currentFrame) + 64, 101, -64, 32));
+
+		if (!life) sprite.setTextureRect(IntRect(0, 0, 64, 32));
+
+
+		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
+
+	}
+
+
+	void Collision()
+	{
+
+		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
+			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
+				if (TileMap[i][j] == 'B')
+				{
+					if (dx>0)
+					{
+						rect.left = j * 32 - rect.width; dx *= -1;
+					}
+					else if (dx<0)
+					{
+						rect.left = j * 32 + 32; dx *= -1;
+					}
+
+				}
+	}
+
+};
 
 
 int main()
@@ -196,9 +254,8 @@ int main()
 	image.loadFromFile("Texture.png");
 	image.createMaskFromColor(Color(255, 128, 128));
 
-	Texture t, old_t;
+	Texture t;
 	t.loadFromImage(image);
-	old_t.loadFromFile("Fang.png");
 
 	Sprite tile;
 	tile.setTexture(t);
@@ -213,8 +270,9 @@ int main()
 	float currentFrame = 0;
 
 	PLAYER p(t);
+
 	ENEMY enemy; 
-	enemy.set(t,50*32,50*32);
+	enemy.set(t,12*32,16*32);
 
 	Clock clock;
 	Clock GameTimeClock;
@@ -288,6 +346,18 @@ int main()
 		p.update(time);
 		enemy.update(time);
 
+
+		if (p.rect.intersects(enemy.rect))
+		{
+			if (enemy.life) {
+				if (p.dy>0) { enemy.dx = 0; p.dy = -0.2; enemy.life = false; }
+				else p.health-=1;
+			}
+		}
+
+
+
+
 		if (p.rect.left>640 / 2) offsetX = p.rect.left - 640 / 2;
 
 		window.clear(Color::Black);
@@ -309,6 +379,11 @@ int main()
 					rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 					window.draw(rectangle);
 				}
+               	//if (TileMap[i][j] == 'G') {
+				//	tile.setTextureRect(IntRect(245, 40, 32, 32));
+				//	tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+				//	window.draw(tile);
+				//}
 				if (TileMap[i][j] == 'G') {rectangle.setFillColor(Color::Yellow);
 				rectangle.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 				window.draw(rectangle);
@@ -327,6 +402,7 @@ int main()
 		window.draw(text);
 
 		window.draw(p.sprite);
+		window.draw(enemy.sprite);
 		window.display();
 
 	}

@@ -214,7 +214,7 @@ public:
 		if (dx>0) sprite.setTextureRect(IntRect(249+67 * int(currentFrame), 101, 64, 32));
 		if (dx<0) sprite.setTextureRect(IntRect(249+67 * int(currentFrame) + 64, 101, -64, 32));
 
-		if (!life) sprite.setTextureRect(IntRect(0, 0, 64, 32));
+		if (!life) sprite.setTextureRect(IntRect(577, 321, 64, 32));
 
 
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
@@ -265,7 +265,7 @@ int main()
 	Text text("", font, 20);
 	text.setColor(Color::Blue);
 	text.setStyle(Text::Bold);
-	const int TimeToPass = 200;
+	const int TimeToPass = 120;
 
 	float currentFrame = 0;
 

@@ -315,9 +315,11 @@ public:
 		if (dx>0) sprite.setTextureRect(IntRect(249 + 67 * int(currentFrame), 101, 64, 32));
 		if (dx<0) sprite.setTextureRect(IntRect(249 + 67 * int(currentFrame) + 64, 101, -64, 32));
 
-		if (!life) sprite.setTextureRect(IntRect(577, 321, 64, 32));
-
-
+		if (!life) {
+			sprite.setTextureRect(IntRect(577, 321, 64, 32));
+			sprite.setPosition(rect.left - offsetX, rect.top - offsetY+20);
+		}
+		else
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 
 	}
@@ -370,13 +372,15 @@ public:
 		currentFrame += time * 0.005;
 
 		if (currentFrame >= 2) currentFrame -= 2;
-		if (dx>0) sprite.setTextureRect(IntRect(686 + 38 * int(currentFrame), 513, 32, 64));
-		if (dx<0) sprite.setTextureRect(IntRect(686 + 38 * int(currentFrame) + 32, 513, -32, 64));
+		if (dx>0) sprite.setTextureRect(IntRect(720 + 32 * int(currentFrame), 510, 32, 64));
+		if (dx<0) sprite.setTextureRect(IntRect(720 + 32 * int(currentFrame) + 32, 510, -32, 64));
 
-		if (!life) sprite.setTextureRect(IntRect(577, 321, 64, 32));
+		if (!life) {
+			sprite.setTextureRect(IntRect(816, 543, 64, 32));
+			sprite.setPosition(rect.left - offsetX, rect.top - offsetY + 5 + 37);
+		} else
 
-
-		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
+		sprite.setPosition(rect.left - offsetX, rect.top - offsetY+5);
 
 	}
 
@@ -595,7 +599,7 @@ bool StartGame(){
 					}
 			}
 
-			if (p.life) {
+			if (!died) {
 				if (Keyboard::isKeyPressed(Keyboard::Left))
 				{
 					p.dx = -0.1;
@@ -720,12 +724,12 @@ bool StartGame(){
 				CoinsString << (p.coins + p.levelCoins);
 				LevelString << p.level;
 				LifesString << p.lifes;
-				diedtext.setString("You Died.\n\nYour score: " + CoinsString.str() + "\nYour Level:" + LevelString.str() + "\nLifes:" + LifesString.str() +  "\nPress Space to continue.");
+				diedtext.setString("You Died.\n\nYour score: " + CoinsString.str() + "\nYour Level:" + LevelString.str() + "\nLifes:" + LifesString.str() +  "\nPress Tab to continue.");
 				diedtext.setPosition(100, 100);
 				window.draw(diedtext);
 				TimeToPass = 120 + GameTime;
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Space)) died = false;
+			if (Keyboard::isKeyPressed(Keyboard::Tab)) died = false;
 			window.display();
 		}
 	}

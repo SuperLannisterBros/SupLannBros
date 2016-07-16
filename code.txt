@@ -285,24 +285,47 @@ public:
 	}
 };
 
-class ENEMY_WOLF
+class ENEMY
 {
 
 public:
-	float dx, dy;
+	float dx, dy,speed;
 	FloatRect rect;
 	Sprite sprite;
 	float currentFrame;
 	bool life;
+	int step, TextureH, TextureW, TextureRectW, TextureRectH, TextureDiedRectW, TextureDiedRectH, DiedFall;
 
 
-	void set(Texture &image, int x, int y)
+	void set(Texture &image, int x, int y,string name)
 	{
 		sprite.setTexture(image);
-		rect = FloatRect(x, y, 64, 32);
-		dx = 0.05;
 		currentFrame = 0;
 		life = true;
+		if (name == "wolf"){
+			speed = 0.05;
+			TextureH = 64;
+			TextureW = 32;
+			TextureRectW = 249;
+			step = 67;
+			TextureRectH = 101;
+			TextureDiedRectW = 577;
+			TextureDiedRectH = 321;
+			DiedFall = 20;
+		}
+		if (name == "bear"){
+			speed = 0.05;
+			TextureH = 32;
+			TextureW = 64;
+			TextureRectW = 720;
+			step = 32;
+			TextureRectH = 505;
+			TextureDiedRectW = 816;
+			TextureDiedRectH = 543;
+			DiedFall = 37;
+		}
+		rect = FloatRect(x, y, TextureH, TextureW);
+		dx = speed;
 	}
 
 	void update(float time)
@@ -312,19 +335,18 @@ public:
 		currentFrame += time * 0.005;
 
 		if (currentFrame >= 2) currentFrame -= 2;
-		if (dx>0) sprite.setTextureRect(IntRect(249 + 67 * int(currentFrame), 101, 64, 32));
-		if (dx<0) sprite.setTextureRect(IntRect(249 + 67 * int(currentFrame) + 64, 101, -64, 32));
+		if (dx>0) sprite.setTextureRect(IntRect(TextureRectW + step * int(currentFrame), TextureRectH, TextureH, TextureW));
+		if (dx<0) sprite.setTextureRect(IntRect(TextureRectW + step * int(currentFrame) + TextureH, TextureRectH, -TextureH, TextureW));
 
 		if (!life) {
-			sprite.setTextureRect(IntRect(577, 321, 64, 32));
-			sprite.setPosition(rect.left - offsetX, rect.top - offsetY+20);
+			sprite.setTextureRect(IntRect(TextureDiedRectW, TextureDiedRectH, 64, 32));
+			sprite.setPosition(rect.left - offsetX, rect.top - offsetY + DiedFall);
 		}
 		else
 		sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
 
 	}
 
-
 	void Collision()
 	{
 
@@ -344,67 +366,6 @@ public:
 				}
 	}
 };
-
-class ENEMY_BEAR
-{
-
-public:
-	float dx, dy;
-	FloatRect rect;
-	Sprite sprite;
-	float currentFrame;
-	bool life;
-
-
-	void set(Texture &image, int x, int y)
-	{
-		sprite.setTexture(image);
-		rect = FloatRect(x, y, 32, 64);
-		dx = 0.05;
-		currentFrame = 0;
-		life = true;
-	}
-
-	void update(float time)
-	{
-		rect.left += dx * time;
-		Collision();
-		currentFrame += time * 0.005;
-
-		if (currentFrame >= 2) currentFrame -= 2;
-		if (dx>0) sprite.setTextureRect(IntRect(720 + 32 * int(currentFrame), 510, 32, 64));
-		if (dx<0) sprite.setTextureRect(IntRect(720 + 32 * int(currentFrame) + 32, 510, -32, 64));
-
-		if (!life) {
-			sprite.setTextureRect(IntRect(816, 543, 64, 32));
-			sprite.setPosition(rect.left - offsetX, rect.top - offsetY + 5 + 37);
-		} else
-
-		sprite.setPosition(rect.left - offsetX, rect.top - offsetY+5);
-
-	}
-
-
-	void Collision()
-	{
-
-		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
-			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
-				if (TileMap[i][j] == 'B')
-				{
-					if (dx>0)
-					{
-						rect.left = j * 32 - rect.width; dx *= -1;
-					}
-					else if (dx<0)
-					{
-						rect.left = j * 32 + 32; dx *= -1;
-					}
-
-				}
-	}
-};
-
 
 bool StartGame(){
 	bool over = false;
@@ -448,8 +409,7 @@ bool StartGame(){
 
 	PLAYER p(t);
 
-	ENEMY_WOLF wolfs[countOfPossibleEnemies];
-	ENEMY_BEAR bears[countOfPossibleEnemies];
+	ENEMY enemies[countOfPossibleEnemies];
 
 	Music theme;
 	Music gameover;
@@ -467,7 +427,7 @@ bool StartGame(){
 	int GameTime = 0;
 	int LastTime = 0;
 	int LastTime2 = 0;
-	RectangleShape rectangle(Vector2f(32, 32));
+	//RectangleShape rectangle(Vector2f(32, 32));
 
 
 	p.sprite.setTextureRect(IntRect(40 * int(currentFrame), 244, 30, 30));
@@ -477,17 +437,16 @@ bool StartGame(){
 	while ((window.isOpen()) && (!over))
 	{
 		if (p.spawn) {
-			int w = 0;
-			int r = 0;
+			int k = 0;
 			for (int i = 0; i < H; i++)
 				for (int j = 0; j < W; j++){
 					if (TileMap[i][j] == 'W') {
-						wolfs[w].set(t, j * 32, i * 32);
-						w++;
+						enemies[k].set(t, j * 32, i * 32, "wolf");
+						k++;
 					}
 					if (TileMap[i][j] == 'R') {
-						bears[r].set(t, j * 32, i * 32 - 32);
-						r++;
+						enemies[k].set(t, j * 32, i * 32 - 32, "bear");
+						k++;
 					}
 				}
 			p.spawn = false;
@@ -622,27 +581,19 @@ bool StartGame(){
 
 			p.update(time);
 			p.sprite.setColor(Color::White);
-			for (int i = 0; i < 10; i++) {
+			for (int i = 0; i < countOfPossibleEnemies; i++) {
 
-				wolfs[i].update(time);
-				bears[i].update(time);
-				if (p.rect.intersects(wolfs[i].rect))
-				{
-					if (wolfs[i].life) {
-						if (p.dy>0) { wolfs[i].dx = 0; p.dy = -0.2; wolfs[i].life = false; }
+				enemies[i].update(time);
+
+				if (p.rect.intersects(enemies[i].rect))
+					if (enemies[i].life) {
+						if (p.rect.top < enemies[i].rect.top - 10 && p.dy>0) { enemies[i].dx = 0; p.dy = -0.2; enemies[i].life = false; }
 						else { p.health -= 1; p.sprite.setColor(Color::Red); }
 					}
-				}
-				if (p.rect.intersects(bears[i].rect))
-				{
-					if (bears[i].life) {
-						if (p.rect.top<bears[i].rect.top - 10 && p.dy>0) { bears[i].dx = 0; p.dy = -0.2; bears[i].life = false; }
-						else { p.health -= 1; p.sprite.setColor(Color::Red); }
-					}
-				}
 			}
 
-			
+
+
 
 			if (p.rect.left > 640 / 2 && p.rect.left < 240 * 32 - (640 / 2))offsetX = p.rect.left - 640 / 2;
 
@@ -709,22 +660,21 @@ bool StartGame(){
 			window.draw(text);
 			window.draw(textEffect);
 			window.draw(p.sprite);
-			for (int i = 0; i < 10; i++) {
-				window.draw(wolfs[i].sprite);
-				window.draw(bears[i].sprite);
+			for (int i = 0; i < countOfPossibleEnemies; i++) {
+				window.draw(enemies[i].sprite);
 			}
 			Text diedtext("", font, 40);
 			diedtext.setColor(Color::Red);
 			diedtext.setStyle(Text::Bold);
-			if (p.health <= 0 || died)
-		    {
+			if ((p.health <= 0 || died) && !p.gameOver)
+			{
 				died = true;
 				window.clear(Color::Black);
 				ostringstream CoinsString, LevelString, LifesString;
 				CoinsString << (p.coins + p.levelCoins);
 				LevelString << p.level;
 				LifesString << p.lifes;
-				diedtext.setString("You Died.\n\nYour score: " + CoinsString.str() + "\nYour Level:" + LevelString.str() + "\nLifes:" + LifesString.str() +  "\nPress Tab to continue.");
+				diedtext.setString("You Died.\n\nYour score: " + CoinsString.str() + "\nYour Level:" + LevelString.str() + "\nLifes:" + LifesString.str() + "\nPress Tab to continue.");
 				diedtext.setPosition(100, 100);
 				window.draw(diedtext);
 				TimeToPass = 120 + GameTime;

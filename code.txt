@@ -24,9 +24,10 @@ string getTextMission(int currentMission) {
 	switch (currentMission)//принимается номер миссии и в зависимости от него переменной missionText присваивается различный текст
 	{
 	case 1: missionText = "\nMission 1\n\nПомогите Тириону\nдобраться до стены.\n\nБерегитесь медведей\nи лютоволков,\nсобирайте монеты и\nне пейте слишком\nмного вина\n\n\nНажмите Tab для\nпросмотра задания"; break;
-	case 2: missionText = "\nMission 2\n\nВпереди\nчерный замок!\n\nНе забывай собирать\nмонеты, никогда\nне знаешь, когда\nони пригодятся.\n\n\nНажмите Tab для\nпросмотра задания"; break;
-	case 3: missionText = "\nИ так далее \nи тому подобное....."; break;
-	case 4: missionText = "\nИ так далее \nи тому подобное....."; break;
+	case 2: missionText = "\nMission 2\n\nВпереди\nчерный замок!\n\nНе забывай собирать\nмонеты, и\nпостарайся, не\nпопасть на стрелу\nразбойников\n\nНажмите Tab для\nпросмотра задания"; break;
+	case 3: missionText = "\nMission 3\n\nСтена великолепна\nи рассказы дозорных\nочень увлекательны\n,но пора домой.\n\nПуть лежит через\nДолину Аррен.\nНадеюсь горцы не\nстанут проблемой"; break;
+	case 4: missionText = "\nMission 4\n\nУвы,\n у Кейтилин Старк\nна вас свои планы\nдоберитесь до\nОрлиного Гнезда\nгде над вами\nсостоит суд."; break;
+	case 5: missionText = "\nMission 5\n\nВсего за 100 монет\nнаёмник Бронн победил\nрыцаря долины и\nвыиграл для вас\nсуд поединком.\n\nПройдите через лес и\nдоберитесь до\nлагеря Ланнистеров."; break;
 	}
 
 	return missionText;//ф-ция возвращает текст
@@ -142,7 +143,7 @@ public:
 		else
 		{
 			gameOver = true;
-			level = 3;
+			level = 5;
 		}
 	}
 
@@ -239,6 +240,7 @@ public:
 					coins += levelCoins;
 					level++;
 					levelPassed = true;
+					if (level == 5) coins -= 100;
 					NewLevel(level);
 					/*
 					if (!NewLevel(level))
@@ -303,7 +305,7 @@ public:
 		currentFrame = 0;
 		life = true;
 		if (name == "wolf"){
-			speed = 0.05;
+			speed = 0.06;
 			TextureH = 64;
 			TextureW = 32;
 			TextureRectW = 249;
@@ -314,7 +316,7 @@ public:
 			DiedFall = 20;
 		}
 		if (name == "bear"){
-			speed = 0.05;
+			speed = 0.03;
 			TextureH = 32;
 			TextureW = 64;
 			TextureRectW = 720;
@@ -703,19 +705,27 @@ bool StartGame(){
 			for (int i = 0; i < H; i++)
 				for (int j = 0; j < W; j++)
 				{
-	
-						if (TileMap[i][j] == 'B'&& p.level == 1) {
-						//		tile.setTextureRect(IntRect(312, 36, 32, 32));
-						tile.setTextureRect(IntRect(71, 994, 32, 32));
-						tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
-						window.draw(tile);
-					}
-						if (TileMap[i][j] == 'B'&& p.level == 2) {
+					if (TileMap[i][j] == 'B')
+					{
+						if (p.level == 4 || (p.level == 3 && j>28) || (p.level == 5 && j <= 28)) {
+							//		tile.setTextureRect(IntRect(312, 36, 32, 32));
+							tile.setTextureRect(IntRect(71, 994, 32, 32));
+							tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+							window.draw(tile);
+						}
+						if (p.level == 1 || (p.level == 3 && j <= 28) || p.level == 2) {
 							//		tile.setTextureRect(IntRect(312, 36, 32, 32));
 							tile.setTextureRect(IntRect(362, 37, 32, 32));
 							tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 							window.draw(tile);
 						}
+						if (p.level == 5 && j > 28) {
+							//		tile.setTextureRect(IntRect(312, 36, 32, 32));
+							tile.setTextureRect(IntRect(122, 921, 32, 32));
+							tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+							window.draw(tile);
+						}
+					}
 
 					if (TileMap[i][j] == 'V') {
 						tile.setTextureRect(IntRect(428, 33, 32, 32));
@@ -728,6 +738,14 @@ bool StartGame(){
 						tile.setTextureRect(IntRect(245, 40, 32, 32));
 						tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 						window.draw(tile);
+					}
+
+					if (TileMap[i][j] == 'T') {
+						tile.setTextureRect(IntRect(222, 935, 58, 77));
+						tile.setPosition(j * 32 - offsetX - 29, i * 32 - offsetY - 110);
+						tile.setScale(2, 2);
+						window.draw(tile);
+						tile.setScale(1, 1);
 					}
 
 					if (TileMap[i][j] == '1') {
@@ -756,6 +774,11 @@ bool StartGame(){
 					if (TileMap[i][j] == '5') {
 						tile.setTextureRect(IntRect(1084, 741, 260, 300));
 						tile.setPosition(j * 32 - offsetX - 80, i * 32 - offsetY - 260);
+						window.draw(tile);
+					}
+					if (TileMap[i][j] == '6') {
+						tile.setTextureRect(IntRect(1441, 559, 482, 369));
+						tile.setPosition(j * 32 - offsetX - 80, i * 32 - offsetY - 270);
 						window.draw(tile);
 					}
 					if (TileMap[i][j] == ' ' || TileMap[i][j] == 'E' || TileMap[i][j] == '0') continue;

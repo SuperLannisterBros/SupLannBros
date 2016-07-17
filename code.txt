@@ -403,7 +403,7 @@ public:
 		step = 0;
 		TextureRectH = 741;
 		TextureDiedRectW = 0;
-		TextureDiedRectH = 800;
+		TextureDiedRectH = 1000;
 		DiedFall = 0;
 		rect = FloatRect(x, y, TextureH, TextureW);
 		dx = speed;
@@ -620,7 +620,7 @@ bool StartGame(){
 				{
 					if (enemies[i].life && enemies[i].TextureRectW == 747)
 					{
-						arrows[ArrowNumber].set(t, enemies[i].rect.left, enemies[i].rect.top + 20);
+						arrows[ArrowNumber].set(t, enemies[i].rect.left, enemies[i].rect.top + 23);
 						ArrowNumber++;
 						if (ArrowNumber == 14) ArrowNumber = 0;
 					}
@@ -703,13 +703,19 @@ bool StartGame(){
 			for (int i = 0; i < H; i++)
 				for (int j = 0; j < W; j++)
 				{
-					if (TileMap[i][j] == 'B') {
+	
+						if (TileMap[i][j] == 'B'&& p.level == 1) {
 						//		tile.setTextureRect(IntRect(312, 36, 32, 32));
-						tile.setTextureRect(IntRect(362, 37, 32, 32));
+						tile.setTextureRect(IntRect(71, 994, 32, 32));
 						tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
 						window.draw(tile);
 					}
-
+						if (TileMap[i][j] == 'B'&& p.level == 2) {
+							//		tile.setTextureRect(IntRect(312, 36, 32, 32));
+							tile.setTextureRect(IntRect(362, 37, 32, 32));
+							tile.setPosition(j * 32 - offsetX, i * 32 - offsetY);
+							window.draw(tile);
+						}
 
 					if (TileMap[i][j] == 'V') {
 						tile.setTextureRect(IntRect(428, 33, 32, 32));
@@ -742,6 +748,16 @@ bool StartGame(){
 						window.draw(tile);
 					}
 
+					if (TileMap[i][j] == '4') {
+						tile.setTextureRect(IntRect(0, 764, 265, 55));
+						tile.setPosition(j * 32 - offsetX - 80, i * 32 - offsetY-20);
+						window.draw(tile);
+					}
+					if (TileMap[i][j] == '5') {
+						tile.setTextureRect(IntRect(1084, 741, 260, 300));
+						tile.setPosition(j * 32 - offsetX - 80, i * 32 - offsetY - 260);
+						window.draw(tile);
+					}
 					if (TileMap[i][j] == ' ' || TileMap[i][j] == 'E' || TileMap[i][j] == '0') continue;
 				}
 

@@ -325,15 +325,26 @@ public:
 			DiedFall = 37;
 		}
 		if (name == "archer"){
-			speed = 0.05;
-			TextureH = 64;
-			TextureW = 32;
-			TextureRectW = 249;
-			step = 67;
-			TextureRectH = 101;
-			TextureDiedRectW = 577;
-			TextureDiedRectH = 321;
-			DiedFall = 20;
+			speed = -0.00001;
+			TextureH = 32;
+			TextureW = 64;
+			TextureRectW = 747;
+			step = 32;
+			TextureRectH = 706;
+			TextureDiedRectW = 822;
+			TextureDiedRectH = 739;
+			DiedFall = 37;
+		}
+		if (name == "gorec"){
+			speed = 0.10;
+			TextureH = 32;
+			TextureW = 64;
+			TextureRectW = 742;
+			step = 32;
+			TextureRectH = 607;
+			TextureDiedRectW = 830;
+			TextureDiedRectH = 637;
+			DiedFall = 37;
 		}
 		rect = FloatRect(x, y, TextureH, TextureW);
 		dx = speed;
@@ -474,21 +485,6 @@ bool StartGame(){
 
 	while ((window.isOpen()) && (!over))
 	{
-		if (p.spawn) {
-			int k = 0;
-			for (int i = 0; i < H; i++)
-				for (int j = 0; j < W; j++){
-					if (TileMap[i][j] == 'W') {
-						enemies[k].set(t, j * 32, i * 32, "wolf");
-						k++;
-					}
-					if (TileMap[i][j] == 'R') {
-						enemies[k].set(t, j * 32, i * 32 - 32, "bear");
-						k++;
-					}
-				}
-			p.spawn = false;
-		}
 
 		if (Keyboard::isKeyPressed(Keyboard::Escape)) return true;
 		//if (Keyboard::isKeyPressed(Keyboard::Escape)) over = true;
@@ -568,6 +564,31 @@ bool StartGame(){
 			clock.restart();
 			time = time / p.TimeSpeed;
 			Event event;
+
+			if (p.spawn) {
+				int k = 0;
+				for (int i = 0; i < H; i++)
+					for (int j = 0; j < W; j++){
+						if (TileMap[i][j] == 'W') {
+							enemies[k].set(t, j * 32, i * 32, "wolf");
+							k++;
+						}
+						if (TileMap[i][j] == 'A') {
+							enemies[k].set(t, j * 32, i * 32 - 32, "archer");
+							k++;
+						}
+						if (TileMap[i][j] == 'R') {
+							enemies[k].set(t, j * 32, i * 32 - 32, "bear");
+							k++;
+						}
+						if (TileMap[i][j] == 'C') {
+							enemies[k].set(t, j * 32, i * 32 - 32, "gorec");
+							k++;
+						}
+					}
+				p.spawn = false;
+			}
+
 
 
 			while (window.pollEvent(event))

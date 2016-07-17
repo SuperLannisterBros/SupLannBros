@@ -11,7 +11,7 @@ float offsetX = 0, offsetY = 96;
 
 const int H = 21;
 const int W = 240;
-const int countOfPossibleEnemies = 10;
+const int countOfPossibleEnemies = 15;
 
 String TileMap[H] = {};
 
@@ -374,45 +374,68 @@ public:
 
 		for (int i = rect.top / 32; i<(rect.top + rect.height) / 32; i++)
 			for (int j = rect.left / 32; j<(rect.left + rect.width) / 32; j++)
-				if (TileMap[i][j] == 'B')
-				{
-					if (dx>0)
+					if (TileMap[i][j] == 'B')
 					{
-						rect.left = j * 32 - rect.width; dx *= -1;
-					}
-					else if (dx<0)
-					{
-						rect.left = j * 32 + 32; dx *= -1;
-					}
+						if (dx > 0)
+						{
+							rect.left = j * 32 - rect.width; dx *= -1;
+						}
+						else if (dx < 0)
+						{
+							rect.left = j * 32 + 32; dx *= -1;
+						}
 
-				}
+					}
 	}
 };
 
 class ARROW:public ENEMY{
+public:
 	void set(Texture &image, int x, int y)
 	{
 		sprite.setTexture(image);
 		currentFrame = 0;
 		life = true;
-		speed = 0.10;
-		TextureH = 16;
-		TextureW = 16;
-		TextureRectW = 0;
+		speed = -0.10;
+		TextureH = 28;
+		TextureW = 11;
+		TextureRectW = 916;
 		step = 0;
-		TextureRectH = 0;
+		TextureRectH = 741;
 		TextureDiedRectW = 0;
 		TextureDiedRectH = 800;
 		DiedFall = 0;
 		rect = FloatRect(x, y, TextureH, TextureW);
 		dx = speed;
 	}
+	void update(float time)
+	{
+		rect.left += dx * time;
+		Collision();
+		currentFrame += time * 0.005;
+
+		if (currentFrame >= 2) currentFrame -= 2;
+		if (dx>0) sprite.setTextureRect(IntRect(TextureRectW + step * int(currentFrame), TextureRectH, TextureH, TextureW));
+		if (dx<0) sprite.setTextureRect(IntRect(TextureRectW + step * int(currentFrame) + TextureH, TextureRectH, -TextureH, TextureW));
+
+		if (!life) {
+			sprite.setTextureRect(IntRect(TextureDiedRectW, TextureDiedRectH, 64, 32));
+			sprite.setPosition(rect.left - offsetX, rect.top - offsetY + DiedFall);
+		}
+		else
+			sprite.setPosition(rect.left - offsetX, rect.top - offsetY);
+
+	}
+
 	void Collision()
 	{
 
 		for (int i = rect.top / 32; i < (rect.top + rect.height) / 32; i++)
 			for (int j = rect.left / 32; j < (rect.left + rect.width) / 32; j++)
-				if (TileMap[i][j] == 'B') life = false;
+				if (TileMap[i][j] == 'B')	{
+					life = false;
+					dx = 0;
+				}
 	}
 };
 
@@ -455,10 +478,12 @@ bool StartGame(){
 	s_quest.setPosition(80, 100);//позиция фона для блока
 
 	float currentFrame = 0;
+	int ArrowNumber = 0;
 
 	PLAYER p(t);
 
 	ENEMY enemies[countOfPossibleEnemies];
+	ARROW arrows[countOfPossibleEnemies];
 
 	Music theme;
 	Music gameover;
@@ -476,6 +501,7 @@ bool StartGame(){
 	int GameTime = 0;
 	int LastTime = 0;
 	int LastTime2 = 0;
+	int ShootTime = 0;
 	//RectangleShape rectangle(Vector2f(32, 32));
 
 
@@ -588,9 +614,19 @@ bool StartGame(){
 					}
 				p.spawn = false;
 			}
-
-
-
+			if (GameTime > ShootTime + 2){
+				p.sprite.setColor(Color::White);            
+				for (int i = 0; i < countOfPossibleEnemies; i++)
+				{
+					if (enemies[i].life && enemies[i].TextureRectW == 747)
+					{
+						arrows[ArrowNumber].set(t, enemies[i].rect.left, enemies[i].rect.top + 20);
+						ArrowNumber++;
+						if (ArrowNumber == 14) ArrowNumber = 0;
+					}
+				}
+				ShootTime = GameTime;
+			}
 			while (window.pollEvent(event))
 			{
 
@@ -639,15 +675,21 @@ bool StartGame(){
 
 
 			p.update(time);
-			p.sprite.setColor(Color::White);
+
 			for (int i = 0; i < countOfPossibleEnemies; i++) {
 
 				enemies[i].update(time);
+				arrows[i].update(time);
 
 				if (p.rect.intersects(enemies[i].rect))
 					if (enemies[i].life) {
 						if (p.rect.top < enemies[i].rect.top - 10 && p.dy>0) { enemies[i].dx = 0; p.dy = -0.2; enemies[i].life = false; }
 						else { p.health -= 1; p.sprite.setColor(Color::Red); }
+					}
+				if (p.rect.intersects(arrows[i].rect))
+					if (arrows[i].life) {
+						 arrows[i].dx = 0;  arrows[i].life = false; 
+						 p.health -= 30; p.sprite.setColor(Color::Red); 
 					}
 			}
 
@@ -721,6 +763,7 @@ bool StartGame(){
 			window.draw(p.sprite);
 			for (int i = 0; i < countOfPossibleEnemies; i++) {
 				window.draw(enemies[i].sprite);
+				window.draw(arrows[i].sprite);
 			}
 			Text diedtext("", font, 40);
 			diedtext.setColor(Color::Red);
